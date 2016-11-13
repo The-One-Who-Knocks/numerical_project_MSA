@@ -1,0 +1,8 @@
+On unix environment, compile the file queues.c using the command :
+	gcc -Wall -L/usr/local/include -o name_of_exec queues.c -lgsl -lgslcblas -lm
+It should work if the gsl library has been installed in /usr/local/include.
+Otherwise, replace -L/usr/local/include by -L/path/of/installation
+
+If the gsl library is not installed, use :
+	sudo apt-get install libgsl0ldbl
+in a terminal.
