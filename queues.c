@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
@@ -18,34 +19,40 @@ int main(void){
 
 
 	/* Simulation parameters */
-	int n_iter = 100000;     // Number of iteration
-	int n_rejected = -n_iter; // Total number of rejected particles
+	int n_iter = 1000000;     // Number of iteration
+	int n_rejected = 0; // Total number of rejected particles
 
 	double lambda = 1.;  // Parameter for injected particles
 	double mu = 1.;      // Time for service parameter
 
+	bool rejected = true;
 
 	/* Arrival time and departure time of the first particle */
-	double arrival_time = gsl_ran_exponential(r, 1./lambda);
-	double departure_time = gsl_ran_exponential(r, 1./mu) + arrival_time;
+	double arrival_time = 0.;
+	double departure_time = 0.;
 
 	//printf("arrival_time = %g\n", arrival_time);
 	//printf("departure_time = %g\n", departure_time);
 
 	for(int i=0;i<n_iter;i++){
-		do{
-			n_rejected++;  // Because of this line we need to set n_rejected = -n_iter
+		rejected = true;
+		while(rejected){
 			arrival_time = arrival_time + gsl_ran_exponential(r, 1./lambda);
 			//printf("arrival_time = %g\n", arrival_time);
-		}while(arrival_time < departure_time);
-
+			if(departure_time <= arrival_time){
+				rejected = false;
+			}
+			else{
+				n_rejected++;
+			}
+		}
 		departure_time = gsl_ran_exponential(r, 1./mu) + arrival_time;
 		//printf("departure_time = %g\n", departure_time);
 	}
 
 	
 	/* Results */
-	int n_particles = n_iter + n_rejected +1;  // Total number of particles
+	int n_particles = n_iter + n_rejected;  // Total number of particles
 	printf("n_rejected = %d\n", n_rejected);
 	printf("n_particles = %d\n", n_particles);
 	printf("ratio = %g\n", (double)n_rejected/(double)n_particles);
